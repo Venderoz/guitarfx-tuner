@@ -1,0 +1,8 @@
+D:/Code/Uni/Projects/cppaudio/build/CMakeFiles/rtaudio.dir
+D:/Code/Uni/Projects/cppaudio/build/CMakeFiles/uninstall.dir
+D:/Code/Uni/Projects/cppaudio/build/CMakeFiles/edit_cache.dir
+D:/Code/Uni/Projects/cppaudio/build/CMakeFiles/rebuild_cache.dir
+D:/Code/Uni/Projects/cppaudio/build/CMakeFiles/list_install_components.dir
+D:/Code/Uni/Projects/cppaudio/build/CMakeFiles/install.dir
+D:/Code/Uni/Projects/cppaudio/build/CMakeFiles/install/local.dir
+D:/Code/Uni/Projects/cppaudio/build/CMakeFiles/install/strip.dir

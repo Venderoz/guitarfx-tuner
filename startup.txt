@@ -1,0 +1,4 @@
+cd ...YourPathHere...\guitarfx-tuner
+g++ main.cpp -o main -I./rtaudio -L./build -lrtaudio -lole32 -lwinmm -ldsound
+main.exe
+
