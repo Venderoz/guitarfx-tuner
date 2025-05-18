@@ -1,4 +1,7 @@
-cd ...YourPathHere...\guitarfx-tuner
-g++ main.cpp -o main -I./rtaudio -L./build -lrtaudio -lole32 -lwinmm -ldsound
-main.exe
+cd D:/Code/Uni/Projects/cppaudio
+g++ main.cpp -o mic_detect -I./rtaudio -I./fftw -L./build -L. -lrtaudio -lfftw3-3 -lole32 -lwinmm -ldsound
+./mic_detect
 
+CMD:
+cd D:/Code/Uni/Projects/cppaudio
+mic_detect
