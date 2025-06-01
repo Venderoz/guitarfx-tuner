@@ -1,6 +1,10 @@
 cd D:/Code/Uni/Projects/cppaudio
-g++ main.cpp -o mic_detect -I./rtaudio -I./fftw -L./build -L. -lrtaudio -lfftw3-3 -lole32 -lwinmm -ldsound
-./mic_detect
+g++ tuner.cpp -o tuner.exe -I./rtaudio -I./fftw -L./build -L. -lrtaudio -lfftw3-3 -lole32 -lwinmm -ldsound
+./tuner
+
+cd D:/Code/Uni/Projects/cppaudio
+g++ audio_passthrough.cpp main.cpp effects.cpp effect_chain.cpp -o main.exe -I./rtaudio -I./fftw -L./build -L. -lrtaudio -lfftw3-3 -lole32 -lwinmm -ldsound
+./main
 
 CMD:
 cd D:/Code/Uni/Projects/cppaudio

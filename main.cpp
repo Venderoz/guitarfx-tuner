@@ -1,134 +1,222 @@
-#include "RtAudio.h"
 #include <iostream>
-#include <cmath>
+#include <memory>
 #include <thread>
-#include <chrono>
-#include <map>
-#include <string>
+#include "audio_passthrough.h"
+#include "effect_chain.h"
+#include "effects.h"
 
-#ifndef PI
-#define PI 3.14159265358979323846
-#endif
+std::atomic<bool> running{true};
 
-float targetFrequency = 82.41f; // default E2
-
-float detectFrequencyAutocorrelation(const float *samples, int bufferSize, int sampleRate)
+void userInterface(std::shared_ptr<EffectChain> chain)
 {
-    float minExpected = targetFrequency * 0.8f;
-    float maxExpected = targetFrequency * 1.25f;
-    int minLag = static_cast<int>(sampleRate / maxExpected);
-    int maxLag = static_cast<int>(sampleRate / minExpected);
+    std::string input;
+    chain->listEffects();
 
-    float maxCorr = 0.0f;
-    int bestLag = -1;
-
-    for (int lag = minLag; lag <= maxLag; ++lag)
+    while (running)
     {
-        float sum = 0.0f;
-        for (int i = 0; i < bufferSize - lag; ++i)
-            sum += samples[i] * samples[i + lag];
+        std::cout << "\n[COMMANDS]\n 1:Toggle Dist | 2:Toggle Chorus | 3:Toggle Delay\n g:Set Input Gain\n d:Dist Params | c:Chorus Params | l:Delay Params\n q:Quit\n> ";
+        std::getline(std::cin, input);
 
-        if (sum > maxCorr)
+        if (input == "1")
         {
-            maxCorr = sum;
-            bestLag = lag;
+            chain->toggleEffect(0);
         }
-    }
-
-    if (bestLag > 0)
-        return static_cast<float>(sampleRate) / bestLag;
-    else
-        return 0.0f;
-}
-
-// Calculate pitch deviation in cents
-float centsDifference(float detected, float target)
-{
-    return 1200.0f * log2f(detected / target);
-}
-
-int audioCallback(void *outputBuffer, void *inputBuffer,
-                  unsigned int nBufferFrames,
-                  double streamTime, RtAudioStreamStatus status, void *userData)
-{
-    if (status)
-        std::cerr << "Stream error!" << std::endl;
-
-    float *input = static_cast<float *>(inputBuffer);
-    static int frameCount = 0;
-
-    if (++frameCount >= 20)
-    {
-        float freq = detectFrequencyAutocorrelation(input, nBufferFrames, 48000);
-
-        if (freq > targetFrequency * 0.5f && freq < targetFrequency * 2.0f) // guitar range restriction
+        else if (input == "2")
         {
-            float cents = centsDifference(freq, targetFrequency);
-            std::cout << "Frequency: " << freq << " Hz | ";
-            if (std::abs(cents) < 5.0f)
-                std::cout << "In tune (" << cents << " cents)" << std::endl;
-            else if (cents > 0)
-                std::cout << "Too sharp (+" << cents << " cents)" << std::endl;
+            chain->toggleEffect(1);
+        }
+        else if (input == "3")
+        {
+            chain->toggleEffect(2);
+        }
+        else if (input == "g")
+        {
+            float g;
+            std::cout << "Input Gain [0-10]: ";
+            if (std::cin >> g)
+            {
+                if (g < 0.0f || g > 10.0f)
+                    std::cout << "Value out of range!\n";
+                else
+                    chain->setInputGain(g);
+            }
             else
-                std::cout << "Too flat (" << cents << " cents)" << std::endl;
+            {
+                std::cout << "Invalid input!\n";
+                std::cin.clear();
+                std::cin.ignore(10000, '\n');
+            }
         }
 
-        frameCount = 0;
+        // ---- DISTORTION PARAMS ----
+        else if (input == "d")
+        {
+            auto dist = std::dynamic_pointer_cast<DistortionEffect>(chain->getEffect(0));
+            if (!dist)
+                continue;
+
+            std::cout << "[Distortion] Gain = " << dist->getGain()
+                      << ", Mix = " << dist->getMix() << "\n";
+            std::cout << "Change (1:Gain, 2:Mix, 0:Cancel): ";
+            std::getline(std::cin, input);
+
+            if (input == "1")
+            {
+                float val;
+                std::cout << "New Gain [0-10]: ";
+                if (std::cin >> val)
+                {
+                    if (val < 0.0f || val > 10.0f)
+                        std::cout << "Value out of range!\n";
+                    else
+                        dist->setGain(val);
+                }
+                else
+                {
+                    std::cout << "Invalid input!\n";
+                    std::cin.clear();
+                    std::cin.ignore(10000, '\n');
+                }
+            }
+            else if (input == "2")
+            {
+                float val;
+                std::cout << "New Mix [0 - 1]: ";
+                if (std::cin >> val)
+                {
+                    if (val < 0.0f || val > 1.0f)
+                        std::cout << "Value out of range!\n";
+                    else
+                        dist->setMix(val);
+                }
+                else
+                {
+                    std::cout << "Invalid input!\n";
+                    std::cin.clear();
+                    std::cin.ignore(10000, '\n');
+                }
+            }
+        }
+
+        // ---- CHORUS PARAMS ----
+        else if (input == "c")
+        {
+            auto chorus = std::dynamic_pointer_cast<ChorusEffect>(chain->getEffect(1));
+            if (!chorus)
+                continue;
+
+            std::cout << "[Chorus] Rate = " << chorus->getRate()
+                      << ", Depth = " << chorus->getDepth() << "\n";
+            std::cout << "Change (1:Rate, 2:Depth, 0:Cancel): ";
+            std::getline(std::cin, input);
+
+            if (input == "1")
+            {
+                float val;
+                std::cout << "New Rate [0.0 - 1.0]: ";
+                if (std::cin >> val)
+                {
+                    if (val < 0.0f || val > 1.0f)
+                        std::cout << "Value out of range!\n";
+                    else
+                        chorus->setRate(val);
+                }
+                else
+                {
+                    std::cout << "Invalid input!\n";
+                    std::cin.clear();
+                    std::cin.ignore(10000, '\n');
+                }
+            }
+            else if (input == "2")
+            {
+                float val;
+                std::cout << "New Depth [0.0 - 0.01]: ";
+                if (std::cin >> val)
+                {
+
+                    if (val < 0.0f || val > 0.01f)
+                        std::cout << "Value out of range!\n";
+                    else
+                        chorus->setDepth(val);
+                }
+                else
+                {
+                    std::cout << "Invalid input!\n";
+                    std::cin.clear();
+                    std::cin.ignore(10000, '\n');
+                }
+            }
+        }
+
+        // ---- DELAY PARAMS ----
+        else if (input == "l")
+        {
+            auto delay = std::dynamic_pointer_cast<DelayEffect>(chain->getEffect(2));
+            if (!delay)
+                continue;
+
+            std::cout << "[Delay] Delay Time = " << delay->getDelayTime()
+                      << " sec\nChange (1:Time, 0:Cancel): ";
+            std::getline(std::cin, input);
+
+            if (input == "1")
+            {
+                float val;
+                std::cout << "New Delay Time [0.05 - 1.0]: ";
+                if (std::cin >> val)
+                {
+
+                    if (val < 0.05f || val > 1.0f)
+                        std::cout << "Value out of range!\n";
+                    else
+                        delay->setDelayTime(val);
+                }
+                else
+                {
+                    std::cout << "Invalid input!\n";
+                    std::cin.clear();
+                    std::cin.ignore(10000, '\n');
+                }
+            }
+        }
+
+        else if (input == "q")
+        {
+            running = false;
+            break;
+        }
+
+        chain->listEffects();
     }
-
-    return 0;
 }
-
 int main()
 {
-    // Mapping of string names to frequencies
-    std::map<std::string, float> stringFrequencies = {
-        {"E2", 82.41f}, {"A2", 110.00f}, {"D3", 146.83f}, {"G3", 196.00f}, {"B3", 246.94f}, {"E4", 329.63f}};
-
-    std::string input;
-    std::cout << "Select a string to tune (E2, A2, D3, G3, B3, E4): ";
-    std::cin >> input;
-
-    if (stringFrequencies.count(input))
-    {
-        targetFrequency = stringFrequencies[input];
-        std::cout << "Tuning string " << input << " (" << targetFrequency << " Hz)" << std::endl;
-    }
-    else
-    {
-        std::cerr << "Unknown string, defaulting to E2 (82.41 Hz)" << std::endl;
-    }
-
     try
     {
-        RtAudio audio(RtAudio::WINDOWS_WASAPI);
-        if (audio.getDeviceCount() < 1)
-        {
-            std::cerr << "No audio devices found!" << std::endl;
-            return 1;
-        }
-
         unsigned int sampleRate = 48000;
-        unsigned int bufferFrames = 2048;
+        auto chain = std::make_shared<EffectChain>();
+        chain->setInputGain(8.0f);
 
-        RtAudio::StreamParameters inputParams;
-        inputParams.deviceId = audio.getDefaultInputDevice();
-        inputParams.nChannels = 1;
-        inputParams.firstChannel = 0;
+        auto distortion = std::make_shared<DistortionEffect>(8.0f, 1.0f);
+        auto chorus = std::make_shared<ChorusEffect>(sampleRate);
+        auto delay = std::make_shared<DelayEffect>(sampleRate);
 
-        std::cout << "Using device: " << audio.getDeviceInfo(inputParams.deviceId).name << std::endl;
-        audio.openStream(nullptr, &inputParams, RTAUDIO_FLOAT32,
-                         sampleRate, &bufferFrames, &audioCallback, nullptr);
+        chain->addEffect(distortion, "Distortion", false);
+        chain->addEffect(chorus, "Chorus", false);
+        chain->addEffect(delay, "Delay", false);
 
-        std::cout << "Listening to microphone (Ctrl+C to stop)..." << std::endl;
-        audio.startStream();
+        std::thread uiThread(userInterface, chain);
 
-        while (true)
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+        AudioPassthrough passthrough(chain.get());
+        passthrough.start(sampleRate);
+
+        if (uiThread.joinable())
+            uiThread.join();
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "[ERROR] " << e.what() << std::endl;
         return 1;
     }
 
