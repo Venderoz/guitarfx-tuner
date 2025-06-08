@@ -1,11 +1,11 @@
 cd D:/Code/Uni/Projects/cppaudio
-g++ tuner.cpp -o tuner.exe -I./rtaudio -I./fftw -L./build -L. -lrtaudio -lfftw3-3 -lole32 -lwinmm -ldsound
-./tuner
+g++ tuner_app/main.cpp tuner_app/tuner.cpp tuner_app/frequency_detector.cpp -o tuner_app/app -I./tuner_app -I./rtaudio -L./build -L. -lrtaudio -lole32 -lwinmm -ldsound
+./tuner_app/app
 
 cd D:/Code/Uni/Projects/cppaudio
-g++ audio_passthrough.cpp main.cpp effects.cpp effect_chain.cpp -o main.exe -I./rtaudio -I./fftw -L./build -L. -lrtaudio -lfftw3-3 -lole32 -lwinmm -ldsound
-./main
+g++ effects_app/main.cpp effects_app/effects.cpp effects_app/effect_chain.cpp effects_app/audio_passthrough.cpp -o effects_app/app -I./effects_app -I./rtaudio -L./build -L. -lrtaudio -lole32 -lwinmm -ldsound
+./effects_app/app
 
 CMD:
-cd D:/Code/Uni/Projects/cppaudio
-mic_detect
+cd D:/Code/Uni/Projects/cppaudio/tuner_app
+app.exe

@@ -1,9 +1,5 @@
-#include <iostream>
-#include <memory>
-#include <thread>
 #include "audio_passthrough.h"
 #include "effect_chain.h"
-#include "effects.h"
 
 std::atomic<bool> running{true};
 
@@ -14,8 +10,11 @@ void userInterface(std::shared_ptr<EffectChain> chain)
 
     while (running)
     {
-        std::cout << "\n[COMMANDS]\n 1:Toggle Dist | 2:Toggle Chorus | 3:Toggle Delay\n g:Set Input Gain\n d:Dist Params | c:Chorus Params | l:Delay Params\n q:Quit\n> ";
+        std::cout << "\n[COMMANDS]\n G:Set Input Gain\n 1:Toggle Dist | 2:Toggle Chorus | 3:Toggle Delay\n D:Dist Params | C:Chorus Params | L:Delay Params\n q:Quit\n> ";
         std::getline(std::cin, input);
+
+        for (auto &c : input)
+            c = std::toupper(c);
 
         if (input == "1")
         {
@@ -29,7 +28,7 @@ void userInterface(std::shared_ptr<EffectChain> chain)
         {
             chain->toggleEffect(2);
         }
-        else if (input == "g")
+        else if (input == "G")
         {
             float g;
             std::cout << "Input Gain [0-10]: ";
@@ -49,7 +48,7 @@ void userInterface(std::shared_ptr<EffectChain> chain)
         }
 
         // ---- DISTORTION PARAMS ----
-        else if (input == "d")
+        else if (input == "D")
         {
             auto dist = std::dynamic_pointer_cast<DistortionEffect>(chain->getEffect(0));
             if (!dist)
@@ -99,7 +98,7 @@ void userInterface(std::shared_ptr<EffectChain> chain)
         }
 
         // ---- CHORUS PARAMS ----
-        else if (input == "c")
+        else if (input == "C")
         {
             auto chorus = std::dynamic_pointer_cast<ChorusEffect>(chain->getEffect(1));
             if (!chorus)
@@ -150,7 +149,7 @@ void userInterface(std::shared_ptr<EffectChain> chain)
         }
 
         // ---- DELAY PARAMS ----
-        else if (input == "l")
+        else if (input == "L")
         {
             auto delay = std::dynamic_pointer_cast<DelayEffect>(chain->getEffect(2));
             if (!delay)
@@ -163,11 +162,11 @@ void userInterface(std::shared_ptr<EffectChain> chain)
             if (input == "1")
             {
                 float val;
-                std::cout << "New Delay Time [0.05 - 1.0]: ";
+                std::cout << "New Delay Time [0.0 - 1.0]: ";
                 if (std::cin >> val)
                 {
 
-                    if (val < 0.05f || val > 1.0f)
+                    if (val < 0.0f || val > 1.0f)
                         std::cout << "Value out of range!\n";
                     else
                         delay->setDelayTime(val);
@@ -181,7 +180,7 @@ void userInterface(std::shared_ptr<EffectChain> chain)
             }
         }
 
-        else if (input == "q")
+        else if (input == "Q")
         {
             running = false;
             break;
@@ -196,7 +195,7 @@ int main()
     {
         unsigned int sampleRate = 48000;
         auto chain = std::make_shared<EffectChain>();
-        chain->setInputGain(8.0f);
+        chain->setInputGain(5.0f);
 
         auto distortion = std::make_shared<DistortionEffect>(8.0f, 1.0f);
         auto chorus = std::make_shared<ChorusEffect>(sampleRate);

@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <atomic>
 #include "RtAudio.h"
-#include "effects.h"  // Assuming this is where AudioEffect is declared
+#include "effects.h"
 
 extern std::atomic<bool> running;
 
