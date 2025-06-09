@@ -10,7 +10,11 @@ void userInterface(std::shared_ptr<EffectChain> chain)
 
     while (running)
     {
-        std::cout << "\n[COMMANDS]\n G:Set Input Gain\n 1:Toggle Dist | 2:Toggle Chorus | 3:Toggle Delay\n D:Dist Params | C:Chorus Params | L:Delay Params\n q:Quit\n> ";
+        std::cout << "\n[COMMANDS]\n";
+        std::cout << " \033[33mG\033[0m: Set Input Gain\n";
+        std::cout << " \033[33m1\033[0m: Toggle Dist | \033[33m2\033[0m: Toggle Chorus | \033[33m3\033[0m: Toggle Delay\n";
+        std::cout << " \033[33mD\033[0m: Dist Params | \033[33mC\033[0m: Chorus Params | \033[33mL\033[0m: Delay Params\n";
+        std::cout << " \033[33mQ\033[0m: Quit\n> ";
         std::getline(std::cin, input);
 
         for (auto &c : input)
@@ -35,13 +39,13 @@ void userInterface(std::shared_ptr<EffectChain> chain)
             if (std::cin >> g)
             {
                 if (g < 0.0f || g > 10.0f)
-                    std::cout << "Value out of range!\n";
+                    std::cout << "\033[1;31mValue out of range!\033[0m\n";
                 else
                     chain->setInputGain(g);
             }
             else
             {
-                std::cout << "Invalid input!\n";
+                std::cout << "\033[1;31mInvalid input!\033[0m\n";
                 std::cin.clear();
                 std::cin.ignore(10000, '\n');
             }
@@ -56,7 +60,7 @@ void userInterface(std::shared_ptr<EffectChain> chain)
 
             std::cout << "[Distortion] Gain = " << dist->getGain()
                       << ", Mix = " << dist->getMix() << "\n";
-            std::cout << "Change (1:Gain, 2:Mix, 0:Cancel): ";
+            std::cout << "Change (\033[33m1\033[0m: Gain, \033[33m2\033[0m: Mix, \033[33m0\033[0m: Cancel): ";
             std::getline(std::cin, input);
 
             if (input == "1")
@@ -66,13 +70,13 @@ void userInterface(std::shared_ptr<EffectChain> chain)
                 if (std::cin >> val)
                 {
                     if (val < 0.0f || val > 10.0f)
-                        std::cout << "Value out of range!\n";
+                        std::cout << "\033[1;31mValue out of range!\033[0m\n";
                     else
                         dist->setGain(val);
                 }
                 else
                 {
-                    std::cout << "Invalid input!\n";
+                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
                     std::cin.clear();
                     std::cin.ignore(10000, '\n');
                 }
@@ -84,15 +88,22 @@ void userInterface(std::shared_ptr<EffectChain> chain)
                 if (std::cin >> val)
                 {
                     if (val < 0.0f || val > 1.0f)
-                        std::cout << "Value out of range!\n";
+                        std::cout << "\033[1;31mValue out of range!\033[0m\n";
                     else
                         dist->setMix(val);
                 }
                 else
                 {
-                    std::cout << "Invalid input!\n";
+                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
                     std::cin.clear();
                     std::cin.ignore(10000, '\n');
+                }
+            }
+            else
+            {
+                if (input != "0")
+                {
+                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
                 }
             }
         }
@@ -106,7 +117,7 @@ void userInterface(std::shared_ptr<EffectChain> chain)
 
             std::cout << "[Chorus] Rate = " << chorus->getRate()
                       << ", Depth = " << chorus->getDepth() << "\n";
-            std::cout << "Change (1:Rate, 2:Depth, 0:Cancel): ";
+            std::cout << "Change (\033[33m1\033[0m: Rate, \033[33m2\033[0m: Depth, \033[33m0\033[0m: Cancel): ";
             std::getline(std::cin, input);
 
             if (input == "1")
@@ -116,13 +127,13 @@ void userInterface(std::shared_ptr<EffectChain> chain)
                 if (std::cin >> val)
                 {
                     if (val < 0.0f || val > 1.0f)
-                        std::cout << "Value out of range!\n";
+                        std::cout << "\033[1;31mValue out of range!\033[0m\n";
                     else
                         chorus->setRate(val);
                 }
                 else
                 {
-                    std::cout << "Invalid input!\n";
+                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
                     std::cin.clear();
                     std::cin.ignore(10000, '\n');
                 }
@@ -135,15 +146,22 @@ void userInterface(std::shared_ptr<EffectChain> chain)
                 {
 
                     if (val < 0.0f || val > 0.01f)
-                        std::cout << "Value out of range!\n";
+                        std::cout << "\033[1;31mValue out of range!\033[0m\n";
                     else
                         chorus->setDepth(val);
                 }
                 else
                 {
-                    std::cout << "Invalid input!\n";
+                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
                     std::cin.clear();
                     std::cin.ignore(10000, '\n');
+                }
+            }
+            else
+            {
+                if (input != "0")
+                {
+                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
                 }
             }
         }
@@ -156,7 +174,7 @@ void userInterface(std::shared_ptr<EffectChain> chain)
                 continue;
 
             std::cout << "[Delay] Delay Time = " << delay->getDelayTime()
-                      << " sec\nChange (1:Time, 0:Cancel): ";
+                      << " sec\nChange (\033[33m1\033[0m: Time, \033[33m0\033[0m: Cancel): ";
             std::getline(std::cin, input);
 
             if (input == "1")
@@ -167,15 +185,22 @@ void userInterface(std::shared_ptr<EffectChain> chain)
                 {
 
                     if (val < 0.0f || val > 1.0f)
-                        std::cout << "Value out of range!\n";
+                        std::cout << "\033[1;31mValue out of range!\033[0m\n";
                     else
                         delay->setDelayTime(val);
                 }
                 else
                 {
-                    std::cout << "Invalid input!\n";
+                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
                     std::cin.clear();
                     std::cin.ignore(10000, '\n');
+                }
+            }
+            else
+            {
+                if (input != "0")
+                {
+                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
                 }
             }
         }
@@ -185,7 +210,12 @@ void userInterface(std::shared_ptr<EffectChain> chain)
             running = false;
             break;
         }
+        else
+        {
+            std::cout << "\033[1;31mInvalid input!\033[0m\n";
+        }
 
+        std::cout << "\n--------------------------------------------------\n";
         chain->listEffects();
     }
 }

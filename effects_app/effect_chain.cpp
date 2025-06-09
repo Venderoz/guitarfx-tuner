@@ -59,6 +59,6 @@ void EffectChain::listEffects() const
     for (size_t i = 0; i < effects_.size(); ++i)
     {
         std::cout << " - [" << i + 1 << "] " << effects_[i].getName()
-                  << " - " << (effects_[i].isEnabled() ? "Enabled" : "Disabled") << "\n";
+                  << " - " << (effects_[i].isEnabled() ? "\033[32mEnabled\033[0m" : "\033[31mDisabled\033[0m") << "\n";
     }
 }

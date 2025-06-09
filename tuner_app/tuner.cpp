@@ -67,12 +67,12 @@ int GuitarTuner::audioCallback(float *input, unsigned int nFrames, RtAudioStream
     if (detected > 20 && detected < 1500)
     {
         std::cout << "Detected: " << detected << " Hz | Target: " << targetFreq << " Hz | ";
-        if (std::abs(detected - targetFreq) <= 0.5f)
-            std::cout << "In tune\n";
+        if (std::abs(detected - targetFreq) <= 1.0f)
+            std::cout << "\033[32mIn tune\033[0m\n";
         else if (detected > targetFreq)
-            std::cout << "Too sharp\n";
+            std::cout << "\033[31mToo sharp\033[0m\n";
         else
-            std::cout << "Too flat\n";
+            std::cout << "\033[34mToo flat\033[0m\n";
     }
 
     frameCount = 0;
@@ -88,7 +88,7 @@ bool GuitarTuner::selectString()
     std::string input;
     while (true)
     {
-        std::cout << "\nSelect string to tune (E2, A2, D3, G3, B3, E4), or 'Q' to quit: ";
+        std::cout << "\nSelect string to tune (\033[33mE2\033[0m, \033[33mA2\033[0m, \033[33mD3\033[0m, \033[33mG3\033[0m, \033[33mB3\033[0m, \033[33mE4\033[0m), or '\033[33mQ\033[0m' to quit: ";
         std::getline(std::cin, input);
 
         // Convert input to uppercase for case-insensitive comparison
@@ -108,7 +108,7 @@ bool GuitarTuner::selectString()
         }
         else
         {
-            std::cout << "Invalid string. Try again.\n";
+            std::cout << "\033[1;31mInvalid string! Try again!\033[0m\n";
         }
     }
 }

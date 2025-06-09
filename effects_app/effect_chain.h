@@ -20,7 +20,7 @@ private:
     std::string name_;
     bool enabled_;
 };
-
+// A composite effect that contains and manages a chain of multiple effects
 class EffectChain : public AudioEffect
 {
 public:
@@ -31,6 +31,7 @@ public:
     float getInputGain() const;
     void enableEffect(size_t index, bool enabled);
     void toggleEffect(size_t index);
+    // Gets the underlying AudioEffect by index
     std::shared_ptr<AudioEffect> getEffect(size_t index) const;
     void listEffects() const;
 
