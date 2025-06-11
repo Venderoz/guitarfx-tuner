@@ -13,7 +13,7 @@ float DistortionEffect::getMix() const { return mix_; }
 float DistortionEffect::process(float inputSample)
 {
     float x = gain_ * inputSample;
-    float threshold = 0.4f;
+    float threshold = 0.5f;
     float distorted = (x > threshold) ? threshold : (x < -threshold ? -threshold : x);
     return mix_ * distorted + (1.0f - mix_) * inputSample;
 }
@@ -26,7 +26,7 @@ ChorusEffect::ChorusEffect(unsigned int sampleRate, float rate, float depth)
 }
 
 void ChorusEffect::setRate(float rate) { rate_ = rate; }
-void ChorusEffect::setDepth(float depth) { depth_ = depth; }
+void ChorusEffect::setDepth(float depth) { depth_ = (depth / 100); }
 
 float ChorusEffect::getRate() const { return rate_; }
 float ChorusEffect::getDepth() const { return depth_; }

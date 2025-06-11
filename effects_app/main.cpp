@@ -34,24 +34,18 @@ void userInterface(std::shared_ptr<EffectChain> chain)
         }
         else if (input == "G")
         {
-            float g;
             std::cout << "Input Gain [0-10]: ";
-            if (std::cin >> g)
-            {
-                if (g < 0.0f || g > 10.0f)
-                    std::cout << "\033[1;31mValue out of range!\033[0m\n";
-                else
-                    chain->setInputGain(g);
-            }
+            std::string valStr;
+            std::getline(std::cin, valStr);
+            std::stringstream ss(valStr);
+            float val;
+            if (ss >> val && val >= 0.0f && val <= 10.0f)
+                chain->setInputGain(val);
             else
-            {
-                std::cout << "\033[1;31mInvalid input!\033[0m\n";
-                std::cin.clear();
-                std::cin.ignore(10000, '\n');
-            }
+                std::cout << "\033[1;31mInvalid or out of range!\033[0m\n";
         }
 
-        // ---- DISTORTION PARAMS ----
+        // Distortion
         else if (input == "D")
         {
             auto dist = std::dynamic_pointer_cast<DistortionEffect>(chain->getEffect(0));
@@ -65,39 +59,27 @@ void userInterface(std::shared_ptr<EffectChain> chain)
 
             if (input == "1")
             {
-                float val;
                 std::cout << "New Gain [0-10]: ";
-                if (std::cin >> val)
-                {
-                    if (val < 0.0f || val > 10.0f)
-                        std::cout << "\033[1;31mValue out of range!\033[0m\n";
-                    else
-                        dist->setGain(val);
-                }
+                std::string valStr;
+                std::getline(std::cin, valStr);
+                std::stringstream ss(valStr);
+                float val;
+                if (ss >> val && val >= 0.0f && val <= 10.0f)
+                    dist->setGain(val);
                 else
-                {
-                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
-                    std::cin.clear();
-                    std::cin.ignore(10000, '\n');
-                }
+                    std::cout << "\033[1;31mInvalid or out of range!\033[0m\n";
             }
             else if (input == "2")
             {
+                std::cout << "New Mix [0-1]: ";
+                std::string valStr;
+                std::getline(std::cin, valStr);
+                std::stringstream ss(valStr);
                 float val;
-                std::cout << "New Mix [0 - 1]: ";
-                if (std::cin >> val)
-                {
-                    if (val < 0.0f || val > 1.0f)
-                        std::cout << "\033[1;31mValue out of range!\033[0m\n";
-                    else
-                        dist->setMix(val);
-                }
+                if (ss >> val && val >= 0.0f && val <= 1.0f)
+                    dist->setMix(val);
                 else
-                {
-                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
-                    std::cin.clear();
-                    std::cin.ignore(10000, '\n');
-                }
+                    std::cout << "\033[1;31mInvalid or out of range!\033[0m\n";
             }
             else
             {
@@ -108,7 +90,7 @@ void userInterface(std::shared_ptr<EffectChain> chain)
             }
         }
 
-        // ---- CHORUS PARAMS ----
+        // Chorus
         else if (input == "C")
         {
             auto chorus = std::dynamic_pointer_cast<ChorusEffect>(chain->getEffect(1));
@@ -116,46 +98,33 @@ void userInterface(std::shared_ptr<EffectChain> chain)
                 continue;
 
             std::cout << "[Chorus] Rate = " << chorus->getRate()
-                      << ", Depth = " << chorus->getDepth() << "\n";
+                      << ", Depth = " << chorus->getDepth() * 100 << "\n";
             std::cout << "Change (\033[33m1\033[0m: Rate, \033[33m2\033[0m: Depth, \033[33m0\033[0m: Cancel): ";
             std::getline(std::cin, input);
 
             if (input == "1")
             {
-                float val;
                 std::cout << "New Rate [0.0 - 1.0]: ";
-                if (std::cin >> val)
-                {
-                    if (val < 0.0f || val > 1.0f)
-                        std::cout << "\033[1;31mValue out of range!\033[0m\n";
-                    else
-                        chorus->setRate(val);
-                }
+                std::string valStr;
+                std::getline(std::cin, valStr);
+                std::stringstream ss(valStr);
+                float val;
+                if (ss >> val && val >= 0.0f && val <= 1.0f)
+                    chorus->setRate(val);
                 else
-                {
-                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
-                    std::cin.clear();
-                    std::cin.ignore(10000, '\n');
-                }
+                    std::cout << "\033[1;31mInvalid or out of range!\033[0m\n";
             }
             else if (input == "2")
             {
+                std::cout << "New Depth [0.0 - 1.0]: ";
+                std::string valStr;
+                std::getline(std::cin, valStr);
+                std::stringstream ss(valStr);
                 float val;
-                std::cout << "New Depth [0.0 - 0.01]: ";
-                if (std::cin >> val)
-                {
-
-                    if (val < 0.0f || val > 0.01f)
-                        std::cout << "\033[1;31mValue out of range!\033[0m\n";
-                    else
-                        chorus->setDepth(val);
-                }
+                if (ss >> val && val >= 0.0f && val <= 1.0f)
+                    chorus->setDepth(val);
                 else
-                {
-                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
-                    std::cin.clear();
-                    std::cin.ignore(10000, '\n');
-                }
+                    std::cout << "\033[1;31mInvalid or out of range!\033[0m\n";
             }
             else
             {
@@ -166,7 +135,7 @@ void userInterface(std::shared_ptr<EffectChain> chain)
             }
         }
 
-        // ---- DELAY PARAMS ----
+        // Delay
         else if (input == "L")
         {
             auto delay = std::dynamic_pointer_cast<DelayEffect>(chain->getEffect(2));
@@ -179,22 +148,15 @@ void userInterface(std::shared_ptr<EffectChain> chain)
 
             if (input == "1")
             {
-                float val;
                 std::cout << "New Delay Time [0.0 - 1.0]: ";
-                if (std::cin >> val)
-                {
-
-                    if (val < 0.0f || val > 1.0f)
-                        std::cout << "\033[1;31mValue out of range!\033[0m\n";
-                    else
-                        delay->setDelayTime(val);
-                }
+                std::string valStr;
+                std::getline(std::cin, valStr);
+                std::stringstream ss(valStr);
+                float val;
+                if (ss >> val && val >= 0.0f && val <= 1.0f)
+                    delay->setDelayTime(val);
                 else
-                {
-                    std::cout << "\033[1;31mInvalid input!\033[0m\n";
-                    std::cin.clear();
-                    std::cin.ignore(10000, '\n');
-                }
+                    std::cout << "\033[1;31mInvalid or out of range!\033[0m\n";
             }
             else
             {
@@ -204,7 +166,6 @@ void userInterface(std::shared_ptr<EffectChain> chain)
                 }
             }
         }
-
         else if (input == "Q")
         {
             running = false;
@@ -225,7 +186,7 @@ int main()
     {
         unsigned int sampleRate = 48000;
         auto chain = std::make_shared<EffectChain>();
-        chain->setInputGain(5.0f);
+        chain->setInputGain(3.0f);
 
         auto distortion = std::make_shared<DistortionEffect>(8.0f, 1.0f);
         auto chorus = std::make_shared<ChorusEffect>(sampleRate);
@@ -235,6 +196,7 @@ int main()
         chain->addEffect(chorus, "Chorus", false);
         chain->addEffect(delay, "Delay", false);
 
+        // Start the user interface in a separate thread
         std::thread uiThread(userInterface, chain);
 
         AudioPassthrough passthrough(chain.get());

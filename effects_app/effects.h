@@ -56,3 +56,4 @@ private:
     std::vector<float> buffer_;
     int writeIndex_;
 };
+
