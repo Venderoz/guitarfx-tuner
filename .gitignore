@@ -1,6 +1,1 @@
-build/
-dist/
 *.exe
-*.app
-*.spec
-rtaudio/
