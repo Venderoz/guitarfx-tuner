@@ -16,6 +16,35 @@ The **Effects App** functions as a modular effects processor. It captures incomi
 
 Both modules use **RtAudio** to manage cross-platform audio input and output, allowing for direct interaction with audio hardware, with precompiled DLLs aiding runtime execution on Windows.
 
+## 🎧 Audio Hardware & Driver Requirements
+
+To properly capture guitar signal and achieve low-latency audio processing, the application relies on:
+
+- 🎛 **Audio Interface used in development**: [Behringer U-Phoria UM2](https://www.behringer.com/product.html?modelCode=P0AVV)  
+  Used to connect an electric guitar directly to the computer via USB.
+
+- 🧰 **ASIO4ALL**: [www.asio4all.org](http://www.asio4all.org)  
+  This universal ASIO driver provides low-latency audio input/output on Windows systems. It must be installed and correctly configured to route audio through the Behringer UM2.
+
+## 🪟 How to Run on Windows
+
+1. **Connect Your Guitar**  
+   Plug your electric guitar into the **INST** input of the **Behringer UM2** audio interface.
+
+2. **Connect the Interface**  
+   Use a USB cable to connect the UM2 to your PC. Ensure it is recognized by the system.
+
+3. **Install and Configure ASIO4ALL**  
+   - Download and install [ASIO4ALL](http://www.asio4all.org).
+   - Open the **ASIO4ALL control panel**.
+   - Set proper Input and Output devices.
+   - Disable any unused audio devices that could interfere.
+
+4. **Run the App**  
+   Launch a chosen `.exe` file. No additional setup is needed if you are on Windows — the required **RtAudio DLLs** are already provided in the executable folder.
+
+> ⚠️ On other operating systems (Linux/macOS), you may need to manually compile RtAudio and adjust input/output device configurations, as precompiled binaries are Windows-specific.
+
 ## 🧪 Technologies Used
 
 - **Language**: C++
